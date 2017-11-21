@@ -1,0 +1,115 @@
+body {
+  position: fixed;
+
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+make-a-mix {
+  flex: 1 1 auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-end;
+}
+
+current-mix {
+  display: flex;
+  flex-direction: column;
+
+  item {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+mix-input {
+  display: flex;
+
+  align-items: center;
+}
+
+
+
+make-mats {
+  flex: 1 1 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  mats {
+    display: flex;
+
+    max-width: 100%;
+
+    overflow: auto;
+
+    direction: rtl;
+
+    mat {
+      width: 5em;
+      height: 5em;
+
+      padding: 0.25em;
+
+      flex: 0 0 auto;
+
+      display: flex;
+      flex-direction: column;
+
+      justify-content: space-between;
+      align-items: center;
+
+      border: solid 1px #000;
+
+      direction: ltr;
+
+      overflow: auto;
+
+      cursor: pointer;
+
+      &.selected {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      div.name {
+        max-width: 100%;
+
+        overflow: auto;
+
+        text-align: center;
+      }
+
+      div.seed-type {
+        font-size: 0.75em;
+
+        color: #00D100;
+
+        text-align: center;
+      }
+
+      div.seed-mass {
+        font-size: 0.7em;
+
+        color: #990000;
+
+        text-align: center;
+      }
+    }
+  }
+}
