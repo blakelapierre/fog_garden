@@ -9,7 +9,15 @@ import {spawn, spawnSync} from 'child_process';
 
 import mainRelay from './mainRelay';
 
-mainRelay.components.forEach(component => component.status = readPinSync(component.pin));
+const each = (structure, property, fn, scope = this) => structure.data[property].forEach(fn.bind(scope));
+const map = (structure, property, fn, scope = this) => structure.data[property].map(({data}, i) => fn.call(scope, data, i));
+
+const iter = (able, fn, scope = this) => able[fn].call(scope);
+
+const readAndSetModuleStatus = relay => each(relay, 'modules', module => module.data.status = readPinSync(module.data.component.data.pin));
+
+readAndSetModuleStatus(mainRelay);
+
 
 const port = process.env.port || 9999,
       name = process.env.name || 'fog',
@@ -19,23 +27,67 @@ const app = new koa();
 
 router
   .get('/', async function (ctx) {
-    mainRelay.components.forEach(component => component.status = readPinSync(component.pin));
-    console.log(mainRelay.components);
+    readAndSetModuleStatus(mainRelay);
+
+    console.log('current state:', mainRelay.data.modules);
 
     ctx.body =
 `<!doctype html>
 <html>
   <head>
     <title>Fog Garden</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+
+        height: 100vh;
+
+        display: flex;
+
+        flex-direction: column;
+        justify-content: space-between;
+
+        font-size: 2em;
+      }
+
+      relay-control {
+        display: flex;
+        flex: 1 1 auto;
+      }
+
+      relay-control button {
+        flex: 1 1 auto;
+
+        padding-left: 1rem;
+
+        font-size: 2em;
+
+        text-align: left;
+      }
+
+      relay-control button.off { background-color: #d00; }
+      relay-control button.on { background-color: #0d0; }
+    </style>
   </head>
-  <body style="margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; font-size: 2em;">
-  ${mainRelay.components.map(({name, relay, pin, status}) => `<relay-control style="display: flex; flex: 1 1 auto;"><button style="flex: 1 1 auto; padding-left: 1rem; font-size: 2em; text-align: left; background-color: ${status === 0 ? '#d00' : '#0d0'}" onclick="toggle(${relay}, ${1 - status})">${relay} - ${name} (${status === 0 ? 'off' : 'on'})</button></relay-control>`).join('\n')}
+  <body>${
+
+    map(mainRelay, 'modules', ({
+      index,
+      component: {type, data: {name, pin}},
+      status
+    }) => `
+    <relay-control>
+      <button class="${status === 0 ? 'off' : 'on'}" onclick="toggle(${index}, ${1 - status})">${index} - ${type} - ${name} (${status === 0 ? 'off' : 'on'})</button>
+    </relay-control>`).join('')
+  }
 
     <script>
-      function toggle(relay, value) {
+      function toggle(relayIndex, value) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open('PUT', '/relay/' + relay + '/' + value);
+        xhr.open('PUT', '/relay/' + relayIndex + '/' + value);
         xhr.send();
 
         window.location.reload();
