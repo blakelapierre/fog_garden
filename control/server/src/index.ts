@@ -5,7 +5,7 @@ import * as Router from 'koa-trie-router';
 
 const router = new Router();
 
-import {Gpio} from 'onoff';
+import * as wpi from 'wiring-pi';
 
 import mainRelay from './mainRelay';
 
@@ -15,6 +15,8 @@ const port = process.env.port || 9999,
       name = process.env.name || 'fog',
       pass = process.env.pass || 'garden';
 
+wpi.setup('wpi');
+
 const app = new koa();
 
 router
@@ -23,8 +25,7 @@ router
   })
   .get('/gpio/:pin', async function (ctx, next) {
     const {pin} = ctx.params,
-          gpio = new Gpio(parseInt(pin)),
-          value = gpio.readSync();
+          value = wpi.digitalRead(parseInt(pin));
 
     ctx.body = value;
 
@@ -42,9 +43,7 @@ router
 
     ctx.body = value;
 
-    const gpio = new Gpio(parseInt(pin), 'out');
-
-    gpio.writeSync(value === '0' ? 0 : 1);
+    wpi.digitalWrite(parseInt(pin), parseInt(value));
 
     console.log('set', pin, 'value was', value);
   })
@@ -62,9 +61,8 @@ router
     const component = mainRelay.components[parseInt(number) - 1];
 
     if (component) {
-      const gpio = new Gpio(component.pin, 'out');
+      wpi.digitalWrite(parseInt(pin), parseValue(value));
 
-      gpio.writeSync(parseInt(value));
       console.log('wrote', value, 'to', component.pin);
     }
 

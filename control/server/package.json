@@ -44,6 +44,6 @@
     "koa-router": "^7.3.0",
     "koa-trie-router": "^2.1.6",
     "koala": "^1.0.0",
-    "onoff": "^1.1.8"
+    "wiring-pi": "^2.2.1"
   }
 }
