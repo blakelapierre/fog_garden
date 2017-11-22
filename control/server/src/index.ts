@@ -133,15 +133,15 @@ router
       return;
     }
 
-    const component = mainRelay.components[parseInt(number) - 1];
+    const module = mainRelay.data.modules[parseInt(number) - 1];
 
-    if (component) {
-      writePinSync(component.pin, parseInt(value));
+    if (module && module.data.component) {
+      writePinSync(module.data.component.data.pin, parseInt(value));
 
-      console.log('wrote', value, 'to', component.pin);
+      console.log('wrote', value, 'to', module.data.component.data.pin);
     }
 
-    ctx.body = component;
+    ctx.body = module;
   })
   .get('/relay', async function(ctx) {
     ctx.body = mainRelay;
