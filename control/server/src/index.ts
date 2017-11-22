@@ -5,7 +5,7 @@ import * as Router from 'koa-trie-router';
 
 const router = new Router();
 
-import * as wpi from 'wiring-pi';
+import {spawn, spawnSync} from 'child_process';
 
 import mainRelay from './mainRelay';
 
@@ -15,8 +15,6 @@ const port = process.env.port || 9999,
       name = process.env.name || 'fog',
       pass = process.env.pass || 'garden';
 
-wpi.setup('wpi');
-
 const app = new koa();
 
 router
@@ -25,7 +23,7 @@ router
   })
   .get('/gpio/:pin', async function (ctx, next) {
     const {pin} = ctx.params,
-          value = wpi.digitalRead(parseInt(pin));
+          value = readSync(parseInt(pin));
 
     ctx.body = value;
 
@@ -43,7 +41,7 @@ router
 
     ctx.body = value;
 
-    wpi.digitalWrite(parseInt(pin), parseInt(value));
+    writeSync(parseInt(pin), parseInt(value));
 
     console.log('set', pin, 'value was', value);
   })
@@ -61,7 +59,7 @@ router
     const component = mainRelay.components[parseInt(number) - 1];
 
     if (component) {
-      wpi.digitalWrite(parseInt(pin), parseValue(value));
+      writeSync(component.pin, parseInt(value));
 
       console.log('wrote', value, 'to', component.pin);
     }
@@ -73,3 +71,12 @@ app.use(router.middleware());
 
 http.createServer(app.callback()).listen(port);
 console.log('HTTP server listing on port', port);
+
+
+function readSync(pin : number) {
+  return spawnSync(`gpio read ${pin}`).output;
+}
+
+function writeSync(pin : number, value : number) {
+  return spawnSync(`gpio write ${pin} ${value}`);
+}
