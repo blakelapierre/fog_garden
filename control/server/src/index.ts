@@ -14,7 +14,7 @@ const map = (structure, property, fn, scope = this) => structure.data[property].
 
 const iter = (able, fn, scope = this) => able[fn].call(scope);
 
-const readAndSetModuleStatus = relay => each(relay, 'modules', module => module.data.status = readPinSync(module.data.component.data.pin));
+const readAndSetModuleStatus = relay => each(relay, 'modules', module => module.set('status', readPinSync(module.get('component').get('pin'))));
 
 readAndSetModuleStatus(mainRelay);
 
@@ -133,12 +133,17 @@ router
       return;
     }
 
-    const module = mainRelay.data.modules[parseInt(number) - 1];
+    const module = mainRelay.get('modules')[parseInt(number) - 1];
 
-    if (module && module.data.component) {
-      writePinSync(module.data.component.data.pin, parseInt(value));
+    if (module) {
+      const component = module.get('component');
 
-      console.log('wrote', value, 'to', module.data.component.data.pin);
+      if (component) {
+        const pin = component.get('pin');
+        writePinSync(pin, parseInt(value));
+
+        console.log('wrote', value, 'to', pin);
+      }
     }
 
     ctx.body = module;

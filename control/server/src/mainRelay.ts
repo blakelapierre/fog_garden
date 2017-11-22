@@ -6,7 +6,9 @@ const Light = (name, {pin} : {pin : number}) => t('Light', {name, pin});
 
 const Fogger = (name, {pin} : {pin : number}) => t('Fogger', {name, pin});
 
-const t = (type, data) => ({type, data});
+const t = (type, data) => Object.setPrototypeOf({type, data}, dataPrototype);
+
+const dataPrototype = {get(property) { return this.data[property]; }, set(property, value) { return (this.data[property] = value); }};
 
 const mainRelay =
   Relay('main', [
