@@ -9,6 +9,8 @@ import {spawn, spawnSync} from 'child_process';
 
 import mainRelay from './mainRelay';
 
+mainRelay.components.forEach(component => component.status = parseInt(readSync(component.pin)));
+
 // const minifarm = new Gpio(28, 'out');
 
 const port = process.env.port || 9999,
@@ -19,8 +21,34 @@ const app = new koa();
 
 router
   .get('/', async function (ctx) {
-    ctx.body = 'test';
+    mainRelay.components.forEach(component => console.log(readSync(component.pin)));
+    mainRelay.components.forEach(component => component.status = parseInt(readSync(component.pin)));
+    console.log(mainRelay.components);
+
+    ctx.body =
+`<!doctype html>
+<html>
+  <head>
+    <title>Fog Garden</title>
+  </head>
+  <body>
+    ${mainRelay.components.map(({name, relay, pin, status}) => `<button onclick="toggle(${relay}, ${1 - status})">${relay} - ${name} (${status === 0 ? 'off' : 'on'})</button>`).join('\n')}
+
+    <script>
+      function toggle(relay, value) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('PUT', '/relay/' + relay + '/' + value);
+        xhr.send();
+
+        window.reload();
+      }
+    </script>
+  </body>
+</html>
+`;
   })
+
   .get('/gpio/:pin', async function (ctx, next) {
     const {pin} = ctx.params,
           value = readSync(parseInt(pin));
@@ -65,6 +93,9 @@ router
     }
 
     ctx.body = component;
+  })
+  .get('/relay', async function(ctx) {
+    ctx.body = mainRelay;
   });
 
 app.use(router.middleware());
