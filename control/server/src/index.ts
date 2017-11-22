@@ -9,9 +9,7 @@ import {spawn, spawnSync} from 'child_process';
 
 import mainRelay from './mainRelay';
 
-mainRelay.components.forEach(component => component.status = parseInt(readSync(component.pin)));
-
-// const minifarm = new Gpio(28, 'out');
+mainRelay.components.forEach(component => component.status = readPinSync(component.pin));
 
 const port = process.env.port || 9999,
       name = process.env.name || 'fog',
@@ -21,7 +19,7 @@ const app = new koa();
 
 router
   .get('/', async function (ctx) {
-    mainRelay.components.forEach(component => component.status = parseInt(readSync(component.pin)));
+    mainRelay.components.forEach(component => component.status = readPinSync(component.pin));
     console.log(mainRelay.components);
 
     ctx.body =
@@ -30,8 +28,8 @@ router
   <head>
     <title>Fog Garden</title>
   </head>
-  <body>
-    ${mainRelay.components.map(({name, relay, pin, status}) => `<button onclick="toggle(${relay}, ${1 - status})">${relay} - ${name} (${status === 0 ? 'off' : 'on'})</button>`).join('\n')}
+  <body style="margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; font-size: 2em;">
+  ${mainRelay.components.map(({name, relay, pin, status}) => `<relay-control style="display: flex; flex: 1 1 auto;"><button style="flex: 1 1 auto; padding-left: 1rem; font-size: 2em; text-align: left; background-color: ${status === 0 ? '#d00' : '#0d0'}" onclick="toggle(${relay}, ${1 - status})">${relay} - ${name} (${status === 0 ? 'off' : 'on'})</button></relay-control>`).join('\n')}
 
     <script>
       function toggle(relay, value) {
@@ -50,7 +48,7 @@ router
 
   .get('/gpio/:pin', async function (ctx, next) {
     const {pin} = ctx.params,
-          value = readSync(parseInt(pin));
+          value = readPinSync(parseInt(pin));
 
     ctx.body = value;
 
@@ -68,7 +66,7 @@ router
 
     ctx.body = value;
 
-    writeSync(parseInt(pin), parseInt(value));
+    writePinSync(parseInt(pin), parseInt(value));
 
     console.log('set', pin, 'value was', value);
   })
@@ -86,7 +84,7 @@ router
     const component = mainRelay.components[parseInt(number) - 1];
 
     if (component) {
-      writeSync(component.pin, parseInt(value));
+      writePinSync(component.pin, parseInt(value));
 
       console.log('wrote', value, 'to', component.pin);
     }
@@ -103,10 +101,10 @@ http.createServer(app.callback()).listen(port);
 console.log('HTTP server listing on port', port);
 
 
-function readSync(pin : number) {
-  return spawnSync(`gpio read ${pin}`, {shell: true}).output[1].toString().replace(/\n$/, '');
+function readPinSync(pin : number) : number {
+  return parseInt(spawnSync(`gpio read ${pin}`, {shell: true}).output[1].toString().replace(/\n$/, ''));
 }
 
-function writeSync(pin : number, value : number) {
+function writePinSync(pin : number, value : number) {
   return spawnSync(`gpio write ${pin} ${value}`, {shell: true}).output[1].toString().replace(/\n$/, '');
 }
