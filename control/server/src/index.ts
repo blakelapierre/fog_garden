@@ -41,7 +41,7 @@ router
         xhr.open('PUT', '/relay/' + relay + '/' + value);
         xhr.send();
 
-        window.reload();
+        window.location.reload();
       }
     </script>
   </body>
