@@ -1,16 +1,6 @@
-const Relay = (name, components) => t('Relay', {name, modules: components.map((c, i) => RelayModule(i + 1, c))});
+import {Relay, Light, Fogger} from './circuitComponents';
 
-const RelayModule = (index, component) => t('RelayModule', {index, component, status: 0});
-
-const Light = (name, {pin} : {pin : number}) => t('Light', {name, pin});
-
-const Fogger = (name, {pin} : {pin : number}) => t('Fogger', {name, pin});
-
-const t = (type, data) => Object.setPrototypeOf({type, data}, dataPrototype);
-
-const dataPrototype = {get(property) { return this.data[property]; }, set(property, value) { return (this.data[property] = value); }};
-
-const mainRelay =
+export default
   Relay('main', [
     Light('All-white', {pin: 29}),
     Light('Minifarm', {pin: 28}),
@@ -19,7 +9,7 @@ const mainRelay =
     Fogger('Minifarm', {pin: 5})
   ]);
 
-console.log(mainRelay);
+// console.log(mainRelay);
 // const mainRelay = {
 //   components: [{
 //     name: 'All-white light',
@@ -49,7 +39,7 @@ console.log(mainRelay);
 //   }]
 // };
 
-export default mainRelay;
+// export default mainRelay;
 
 /*
                   CircuitComponent

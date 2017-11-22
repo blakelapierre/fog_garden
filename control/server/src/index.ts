@@ -18,6 +18,7 @@ const readAndSetModuleStatus = relay => each(relay, 'modules', module => module.
 
 readAndSetModuleStatus(mainRelay);
 
+console.log(mainRelay);
 
 const port = process.env.port || 9999,
       name = process.env.name || 'fog',
