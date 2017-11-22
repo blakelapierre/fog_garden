@@ -23,7 +23,7 @@ router
   })
   .get('/gpio/:pin', async function (ctx, next) {
     const {pin} = ctx.params,
-          gpio = new Gpio(pin);
+          gpio = new Gpio(parseInt(pin));
 
     ctx.body = gpio.readSync();
   })
@@ -38,9 +38,10 @@ router
     }
 
     ctx.body = value;
-    // const gpio = new Gpio(pin, 'out');
 
-    // gpio.writeSync(value === '0' ? 0 : 1);
+    const gpio = new Gpio(pin, 'out');
+
+    gpio.writeSync(value === '0' ? 0 : 1);
   })
   .put('/relay/:number/:value', async function (ctx, next) {
 
@@ -59,6 +60,7 @@ router
       const gpio = new Gpio(component.pin, 'out');
 
       gpio.writeSync(parseInt(value));
+      console.log('wrote', value, 'to', component.pin);
     }
 
     ctx.body = component;
