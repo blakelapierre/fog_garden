@@ -74,9 +74,9 @@ console.log('HTTP server listing on port', port);
 
 
 function readSync(pin : number) {
-  return spawnSync(`gpio read ${pin}`).output;
+  return spawnSync(`gpio read ${pin}`, {shell: true}).output[1].toString().replace(/\n$/, '');
 }
 
 function writeSync(pin : number, value : number) {
-  return spawnSync(`gpio write ${pin} ${value}`);
+  return spawnSync(`gpio write ${pin} ${value}`, {shell: true}).output[1].toString().replace(/\n$/, '');
 }
