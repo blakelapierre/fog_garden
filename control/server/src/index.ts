@@ -21,7 +21,6 @@ const app = new koa();
 
 router
   .get('/', async function (ctx) {
-    mainRelay.components.forEach(component => console.log(readSync(component.pin)));
     mainRelay.components.forEach(component => component.status = parseInt(readSync(component.pin)));
     console.log(mainRelay.components);
 
