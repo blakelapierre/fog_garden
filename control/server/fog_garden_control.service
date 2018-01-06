@@ -1,0 +1,9 @@
+[Unit]
+Description=Fog Garden Control
+
+[Service]
+ExecStart=cd /home/pi/programs/fog_garden/control/server && gulp dev
+
+[Install]
+WantedBy=multi-user.target
+Alias=fog_garden_control.service
