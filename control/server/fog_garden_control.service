@@ -2,7 +2,7 @@
 Description=Fog Garden Control
 
 [Service]
-ExecStart=cd /home/pi/programs/fog_garden/control/server && gulp dev
+ExecStart=/home/pi/.nvm/versions/node/v9.3.0/bin/node /home/pi/programs/fog_garden/control/server/.dist/index.js
 
 [Install]
 WantedBy=multi-user.target
