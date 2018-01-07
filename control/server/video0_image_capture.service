@@ -1,0 +1,9 @@
+[Unit]
+Description=Video0 Image Capture
+
+[Service]
+ExecStart=ffmpeg -i /dev/video0 -f image2 -vf fps=1/60 /home/pi/images/video0/%03d.jpg
+
+[Install]
+WantedBy=multi-user.target
+Alias=video0_image_capture.service
