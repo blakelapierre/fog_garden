@@ -2,7 +2,7 @@
 Description=Video0 Image Capture
 
 [Service]
-ExecStart=ffmpeg -i /dev/video0 -f image2 -vf fps=1/60 /home/pi/images/video0/%03d.jpg
+ExecStart=/usr/bin/ffmpeg -i /dev/video0 -f image2 -vf fps=1/60 /home/pi/images/video0/%03d.jpg
 
 [Install]
 WantedBy=multi-user.target
