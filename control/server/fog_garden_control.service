@@ -3,6 +3,8 @@ Description=Fog Garden Control
 
 [Service]
 ExecStart=/home/pi/.nvm/versions/node/v9.3.0/bin/node /home/pi/programs/fog_garden/control/server/.dist/index.js
+Restart=always
+RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
